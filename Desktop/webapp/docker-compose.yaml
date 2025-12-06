@@ -1,0 +1,33 @@
+version: '3.8'
+
+# This section lists all the "boxes" (services/containers) to run
+services:
+  
+  # 1. The Inventory Book Box (The database)
+  db:
+    image: postgres:15-alpine # Use a reliable database image
+    container_name: inventory_book
+    restart: always # If the book box ever closes, open it immediately
+    environment:
+      # These MUST match the secrets you used in app.py for the database connection
+      POSTGRES_DB: toys_db
+      POSTGRES_USER: spandana
+      POSTGRES_PASSWORD: mysecretpassword
+    volumes:
+      # This ensures the data is saved permanently, even if the box is replaced
+      - postgres_data:/var/lib/postgresql/data 
+    
+  # 2. The Store Box (Our web app)
+  web:
+    build: . # Tells Docker Compose to use your Dockerfile (Blueprint)
+    container_name: toy_store_app
+    ports:
+      - "8080:8000" # Map the public door 8080 to the internal store door 8000
+    depends_on:
+      - db # IMPORTANT: DO NOT start the Store until the Inventory Book is ready
+    restart: always
+
+# This section defines the place to save data permanently
+volumes:
+  postgres_data:
+
