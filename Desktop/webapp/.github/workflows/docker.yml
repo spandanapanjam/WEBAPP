@@ -47,3 +47,4 @@ jobs:
             ${{ env.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
           # Use your Dockerfile as the blueprint
           file: ./Dockerfile
+          # Trigger Test
