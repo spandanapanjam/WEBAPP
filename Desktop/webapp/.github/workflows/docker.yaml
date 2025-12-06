@@ -8,7 +8,7 @@ on:
 
 env:
   # 1. Replace with your actual Docker Hub Username
-  DOCKER_USERNAME: <YOUR_DOCKER_USERNAME>
+  DOCKER_USERNAME: spandanapanjam376
   # 2. The name of the image repository
   IMAGE_NAME: toystore
 
