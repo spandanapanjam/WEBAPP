@@ -1,0 +1,49 @@
+# Workflow to build and push the Docker image to Docker Hub
+name: Docker CI/CD
+
+on:
+  # Trigger this workflow on every push to the main branch
+  push:
+    branches: [ main ]
+
+env:
+  # 1. Replace with your actual Docker Hub Username
+  DOCKER_USERNAME: <YOUR_DOCKER_USERNAME>
+  # 2. The name of the image repository
+  IMAGE_NAME: toystore
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    
+    # Only run if Docker Hub username is configured
+    if: success() && env.DOCKER_USERNAME != ''
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        
+      - name: Set up QEMU (for multi-arch building)
+        uses: docker/setup-qemu-action@v3
+        
+      - name: Set up Docker Buildx (improves build performance)
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker Hub Login
+        uses: docker/login-action@v3
+        with:
+          # Use secrets stored in the GitHub repository
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: . # Build from the current folder (WEBAPP)
+          push: true
+          # Now using a single, multi-line tags declaration
+          tags: |
+            ${{ env.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+          # Use your Dockerfile as the blueprint
+          file: ./Dockerfile
